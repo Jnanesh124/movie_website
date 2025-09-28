@@ -1,0 +1,91 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ movie.title }} - Cinevood{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        {% if movie.image_url %}
+            <img src="{{ movie.image_url }}" alt="{{ movie.title }}" class="img-fluid rounded shadow">
+        {% else %}
+            <div class="d-flex align-items-center justify-content-center rounded shadow" 
+                 style="height: 400px; background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-film fa-5x text-white"></i>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-8">
+        <div class="movie-card p-4">
+            <h1 class="movie-title mb-3">{{ movie.title }}</h1>
+            
+            <div class="mb-3">
+                <span class="quality-badge me-2">{{ movie.quality }}</span>
+                <span class="language-badge me-2">{{ movie.language }}</span>
+                <span class="badge bg-warning text-dark">{{ movie.year }}</span>
+            </div>
+            
+            <div class="movie-info mb-4">
+                <div class="row">
+                    <div class="col-6">
+                        <p><i class="fas fa-calendar me-2"></i><strong>Year:</strong> {{ movie.year }}</p>
+                        <p><i class="fas fa-globe me-2"></i><strong>Language:</strong> {{ movie.language }}</p>
+                    </div>
+                    <div class="col-6">
+                        <p><i class="fas fa-video me-2"></i><strong>Quality:</strong> {{ movie.quality }}</p>
+                        <p><i class="fas fa-clock me-2"></i><strong>Posted:</strong> {{ movie.posted_date[:10] }}</p>
+                    </div>
+                </div>
+                <p><i class="fas fa-user me-2"></i><strong>Uploaded by:</strong> @{{ movie.telegram_user }}</p>
+            </div>
+            
+            {% if movie.movie_url %}
+            <div class="d-grid gap-2">
+                <a href="{{ movie.movie_url }}" target="_blank" class="btn download-btn btn-lg">
+                    <i class="fas fa-download me-2"></i>Download Movie
+                </a>
+            </div>
+            {% endif %}
+            
+            <div class="mt-3">
+                <a href="/" class="btn filter-btn">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Movies
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="movie-card p-3">
+            <h5 class="text-white mb-3"><i class="fas fa-share-alt me-2"></i>Share this Movie</h5>
+            <div class="btn-group" role="group">
+                <a href="https://t.me/share/url?url={{ request.url }}&text=Check out {{ movie.title }} on Cinevood!" 
+                   target="_blank" class="btn filter-btn">
+                    <i class="fab fa-telegram me-1"></i>Telegram
+                </a>
+                <a href="https://wa.me/?text=Check out {{ movie.title }} - {{ request.url }}" 
+                   target="_blank" class="btn filter-btn">
+                    <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                </a>
+                <button onclick="copyToClipboard('{{ request.url }}')" class="btn filter-btn">
+                    <i class="fas fa-copy me-1"></i>Copy Link
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Link copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}
