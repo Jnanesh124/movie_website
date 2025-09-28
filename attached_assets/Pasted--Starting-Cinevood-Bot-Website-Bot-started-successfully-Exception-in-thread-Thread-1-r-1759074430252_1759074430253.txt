@@ -1,0 +1,38 @@
+🚀 Starting Cinevood Bot & Website...
+🤖 Bot started successfully!
+Exception in thread Thread-1 (run_bot):
+Traceback (most recent call last):
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/asyncio/unix_events.py", line 105, in add_signal_handler
+    signal.set_wakeup_fd(self._csock.fileno())
+ValueError: set_wakeup_fd only works in main thread of the main interpreter
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/runner/workspace/main.py", line 15, in run_bot
+    bot_main()
+  File "/home/runner/workspace/bot.py", line 198, in main
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/telegram/ext/_application.py", line 779, in run_polling
+    return self.__run(
+           ^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/telegram/ext/_application.py", line 946, in __run
+    loop.add_signal_handler(sig, self._raise_system_exit)
+  File "/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/asyncio/unix_events.py", line 107, in add_signal_handler
+    raise RuntimeError(str(exc))
+RuntimeError: set_wakeup_fd only works in main thread of the main interpreter
+/nix/store/7d088dip86hlzri9sk0h78b63yfmx0a0-python3-3.11.13/lib/python3.11/threading.py:1047: RuntimeWarning: coroutine 'Updater.start_polling' was never awaited
+  self._invoke_excepthook(self)
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+🌐 Starting website on http://0.0.0.0:5000
+ * Serving Flask app 'app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.31.89.98:5000
+Press CTRL+C to quit
