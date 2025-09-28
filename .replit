@@ -3,3 +3,15 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
+
+[workflows]
+runButton = "Start Bot & Website"
+
+[[workflows.workflow]]
+name = "Start Bot & Website"
+author = 48085381
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python3 main.py"
