@@ -195,7 +195,7 @@ def main():
     
     # Start the bot
     print("🤖 Bot started successfully!")
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    application.run_polling(allowed_updates=Update.ALL_TYPES, stop_signals=None)
 
 if __name__ == '__main__':
     main()
