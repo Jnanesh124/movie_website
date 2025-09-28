@@ -6,6 +6,9 @@ import os
 
 app = Flask(__name__)
 
+# Create static/images directory if it doesn't exist
+os.makedirs('static/images', exist_ok=True)
+
 @app.route('/static/images/<filename>')
 def uploaded_file(filename):
     """Serve uploaded images"""
