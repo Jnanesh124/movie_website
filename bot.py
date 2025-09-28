@@ -151,7 +151,27 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Get file info and download URL
     file = await context.bot.get_file(photo.file_id)
-    photo_url = f"https://api.telegram.org/file/bot{context.bot.token}/{file.file_path}"
+    
+    # Download and save the image locally for better access
+    import requests
+    from datetime import datetime
+    
+    # Create images directory if it doesn't exist
+    os.makedirs('static/images', exist_ok=True)
+    
+    # Generate unique filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    image_filename = f"movie_{timestamp}_{photo.file_id}.jpg"
+    image_path = f"static/images/{image_filename}"
+    
+    # Download image
+    response = requests.get(f"https://api.telegram.org/file/bot{context.bot.token}/{file.file_path}")
+    if response.status_code == 200:
+        with open(image_path, 'wb') as f:
+            f.write(response.content)
+        photo_url = f"/static/images/{image_filename}"
+    else:
+        photo_url = None
     
     # Check if caption contains URLs (likely movie post)
     if 'http' in caption:

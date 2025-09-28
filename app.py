@@ -1,10 +1,15 @@
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import sqlite3
 from datetime import datetime
 import os
 
 app = Flask(__name__)
+
+@app.route('/static/images/<filename>')
+def uploaded_file(filename):
+    """Serve uploaded images"""
+    return send_from_directory('static/images', filename)
 
 def get_movies(limit=50, language=None, quality=None, search=None):
     """Get movies from database with filters"""
