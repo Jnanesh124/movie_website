@@ -138,20 +138,80 @@ async def movie_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Image URL (optional)"
     )
 
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle photo messages with captions containing movie information"""
+    if not update.message.photo:
+        return
+        
+    caption = update.message.caption or ""
+    username = update.effective_user.username or update.effective_user.first_name
+    
+    # Get the largest photo
+    photo = update.message.photo[-1]
+    
+    # Get file info and download URL
+    file = await context.bot.get_file(photo.file_id)
+    photo_url = f"https://api.telegram.org/file/bot{context.bot.token}/{file.file_path}"
+    
+    # Check if caption contains URLs (likely movie post)
+    if 'http' in caption:
+        # Extract movie information from caption
+        movie_info = extract_movie_info(caption)
+        
+        # Use the photo URL as image_url
+        movie_info['image_url'] = photo_url
+        
+        # Save to database
+        movie_id = save_movie(movie_info, username)
+        
+        # Create response with direct website link
+        website_url = f"https://{os.getenv('REPL_SLUG', 'your-repl')}-{os.getenv('REPL_OWNER', 'your-username')}.replit.app"
+        movie_url = f"{website_url}/movie/{movie_id}"
+        
+        response = f"""
+✅ Movie with Poster Posted Successfully!
+
+🎬 **{movie_info['title']}**
+📅 Year: {movie_info['year']}
+🎭 Language: {movie_info['language']}
+📺 Quality: {movie_info['quality']}
+🆔 Movie ID: #{movie_id}
+🖼️ Poster: Uploaded
+
+🔗 Direct Link: {movie_url}
+        """
+        
+        # Create inline keyboard
+        keyboard = [
+            [InlineKeyboardButton("🎬 View Movie", url=movie_url)],
+            [InlineKeyboardButton("🌐 Browse All Movies", url=website_url)],
+            [InlineKeyboardButton("📱 Share Movie", switch_inline_query=f"Check out {movie_info['title']} {movie_url}")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        await update.message.reply_text(response, reply_markup=reply_markup, parse_mode='Markdown')
+    else:
+        await update.message.reply_text(
+            "Please add movie details with download links in the photo caption!"
+        )
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle incoming messages with movie information"""
     text = update.message.text
     username = update.effective_user.username or update.effective_user.first_name
     
     # Check if message contains URLs (likely movie post)
-    if 'http' in text:
+    if text and 'http' in text:
         # Extract movie information
         movie_info = extract_movie_info(text)
         
         # Save to database
         movie_id = save_movie(movie_info, username)
         
-        # Create response
+        # Create response with direct website link
+        website_url = f"https://{os.getenv('REPL_SLUG', 'your-repl')}-{os.getenv('REPL_OWNER', 'your-username')}.replit.app"
+        movie_url = f"{website_url}/movie/{movie_id}"
+        
         response = f"""
 ✅ Movie Posted Successfully!
 
@@ -161,13 +221,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 📺 Quality: {movie_info['quality']}
 🆔 Movie ID: #{movie_id}
 
-Your movie has been added to the website!
+🔗 Direct Link: {movie_url}
         """
         
-        # Create inline keyboard with website link
+        # Create inline keyboard with website links
         keyboard = [
-            [InlineKeyboardButton("🌐 View on Website", url="https://your-repl-name.replit.app")],
-            [InlineKeyboardButton("📱 Share Movie", switch_inline_query=f"Check out {movie_info['title']}")]
+            [InlineKeyboardButton("🎬 View Movie", url=movie_url)],
+            [InlineKeyboardButton("🌐 Browse All Movies", url=website_url)],
+            [InlineKeyboardButton("📱 Share Movie", switch_inline_query=f"Check out {movie_info['title']} {movie_url}")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -191,6 +252,7 @@ def main():
     # Add handlers
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("movie", movie_command))
+    application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
     # Start the bot
